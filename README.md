@@ -1,4 +1,4 @@
-## Here you can find realisation of the first Practice Assignments for course "Introduction to Databases"
+## Here you can find realisation of the first Practice Assignment for course "Introduction to Databases"
 
 ## Overview
 
