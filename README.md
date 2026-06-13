@@ -1,6 +1,12 @@
-Here you can find realisation of Practice Assignments for course "Introduction to Databases"
-Data structure:
+## Here you can find realisation of the first Practice Assignments for course "Introduction to Databases"
 
+## Overview
+
+This project contains a banking database with 5 interconnected tables and complex SQL queries demonstrating joins, aggregations, cte and union all operations
+
+## Database Schema
+
+```mermaid
 erDiagram
     CLIENTS {
         int client_id PK
@@ -58,3 +64,14 @@ erDiagram
     ACCOUNTS ||--o{ TRANSACTIONS : has
     CLIENTS ||--o{ LOANS : takes
     ACCOUNTS ||--o{ CARDS : linked_to
+```
+
+## Tables Description
+
+| Table | Rows | Description |
+|---|---|---|
+| `clients` | 10,000 | Bank clients with personal info |
+| `accounts` | 10,000 | Bank accounts linked to clients |
+| `transactions` | 10,000 | Transactions per account |
+| `loans` | 10,000 | Loans taken by clients |
+| `cards` | 10,000 | Cards linked to accounts |
