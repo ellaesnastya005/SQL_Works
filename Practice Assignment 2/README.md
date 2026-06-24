@@ -47,4 +47,10 @@ Then the final select just reads the result of those steps, basically, no repeat
 | Execution time | 966 ms | 342 ms |
 | Buffer hits | 106522 | 9692 |
 
+### Conclusion about bonus task:
+
+Disabling hash join forced PostgreSQL to use merge join + parallel workers (2 workers).
+Interestingly, the execution time dropped to 284 ms due to parallelism, but buffer hits increased (14131 vs 9692) - meaning more memory was used.
+This shows that execution time alone is not the only measure of efficiency.
+
 *Readme file was polished (typo fixes and visual structure) by AI tool.
