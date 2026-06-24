@@ -1,0 +1,49 @@
+|QUERY PLAN                                                                                                                                                                |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|Sort  (cost=46736.12..46736.12 rows=2 width=26) (actual time=340.527..340.529 rows=4.00 loops=1)                                                                          |
+|  Sort Key: (count(*)) DESC                                                                                                                                               |
+|  Sort Method: quicksort  Memory: 25kB                                                                                                                                    |
+|  Buffers: shared hit=9692, temp read=889 written=892                                                                                                                     |
+|  ->  GroupAggregate  (cost=44729.71..46736.11 rows=2 width=26) (actual time=309.340..340.519 rows=4.00 loops=1)                                                          |
+|        Group Key: p.product_category                                                                                                                                     |
+|        Filter: (count(*) > 35000)                                                                                                                                        |
+|        Rows Removed by Filter: 1                                                                                                                                         |
+|        Buffers: shared hit=9692, temp read=889 written=892                                                                                                               |
+|        ->  Sort  (cost=44729.71..45231.29 rows=200634 width=26) (actual time=302.133..323.881 rows=201264.00 loops=1)                                                    |
+|              Sort Key: p.product_category, o.client_id                                                                                                                   |
+|              Sort Method: external merge  Disk: 7112kB                                                                                                                   |
+|              Buffers: shared hit=9692, temp read=889 written=892                                                                                                         |
+|              ->  Hash Join  (cost=8322.65..22257.66 rows=200634 width=26) (actual time=44.673..166.750 rows=201264.00 loops=1)                                           |
+|                    Hash Cond: (o.product_id = p.product_id)                                                                                                              |
+|                    Buffers: shared hit=9692                                                                                                                              |
+|                    ->  Hash Join  (cost=8274.15..21680.26 rows=200634 width=20) (actual time=43.843..143.255 rows=201264.00 loops=1)                                     |
+|                          Hash Cond: (o.client_id = c.id)                                                                                                                 |
+|                          Buffers: shared hit=9666                                                                                                                        |
+|                          ->  Bitmap Heap Scan on opt_orders o  (cost=4550.00..16905.54 rows=400203 width=20) (actual time=14.584..48.184 rows=400507.00 loops=1)         |
+|                                Recheck Cond: (order_date >= '2024-06-22'::date)                                                                                          |
+|                                Heap Blocks: exact=7353                                                                                                                   |
+|                                Buffers: shared hit=7716                                                                                                                  |
+|                                ->  Bitmap Index Scan on idx_orders_date  (cost=0.00..4449.95 rows=400203 width=0) (actual time=13.836..13.836 rows=400507.00 loops=1)    |
+|                                      Index Cond: (order_date >= '2024-06-22'::date)                                                                                      |
+|                                      Index Searches: 1                                                                                                                   |
+|                                      Buffers: shared hit=363                                                                                                             |
+|                          ->  Hash  (cost=3097.49..3097.49 rows=50133 width=16) (actual time=29.152..29.152 rows=50119.00 loops=1)                                        |
+|                                Buckets: 65536  Batches: 1  Memory Usage: 2862kB                                                                                          |
+|                                Buffers: shared hit=1950                                                                                                                  |
+|                                ->  Bitmap Heap Scan on opt_clients c  (cost=564.82..3097.49 rows=50133 width=16) (actual time=2.256..17.857 rows=50119.00 loops=1)       |
+|                                      Recheck Cond: ((status)::text = 'active'::text)                                                                                     |
+|                                      Heap Blocks: exact=1906                                                                                                             |
+|                                      Buffers: shared hit=1950                                                                                                            |
+|                                      ->  Bitmap Index Scan on idx_clients_status  (cost=0.00..552.29 rows=50133 width=0) (actual time=1.969..1.969 rows=50119.00 loops=1)|
+|                                            Index Cond: ((status)::text = 'active'::text)                                                                                 |
+|                                            Index Searches: 1                                                                                                             |
+|                                            Buffers: shared hit=44                                                                                                        |
+|                    ->  Hash  (cost=36.00..36.00 rows=1000 width=14) (actual time=0.818..0.818 rows=1000.00 loops=1)                                                      |
+|                          Buckets: 1024  Batches: 1  Memory Usage: 55kB                                                                                                   |
+|                          Buffers: shared hit=26                                                                                                                          |
+|                          ->  Seq Scan on opt_products p  (cost=0.00..36.00 rows=1000 width=14) (actual time=0.034..0.471 rows=1000.00 loops=1)                           |
+|                                Buffers: shared hit=26                                                                                                                    |
+|Planning:                                                                                                                                                                 |
+|  Buffers: shared hit=19                                                                                                                                                  |
+|Planning Time: 0.955 ms                                                                                                                                                   |
+|Execution Time: 342.680 ms                                                                                                                                                |
