@@ -1,0 +1,65 @@
+|QUERY PLAN                                                                                                                                                                      |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|Sort  (cost=76206.27..76206.27 rows=2 width=26) (actual time=261.780..271.465 rows=4.00 loops=1)                                                                                |
+|  Sort Key: (count(*)) DESC                                                                                                                                                     |
+|  Sort Method: quicksort  Memory: 25kB                                                                                                                                          |
+|  Buffers: shared hit=14131, temp read=2364 written=2371                                                                                                                        |
+|  ->  GroupAggregate  (cost=51334.30..76206.26 rows=2 width=26) (actual time=231.723..271.452 rows=4.00 loops=1)                                                                |
+|        Group Key: p.product_category                                                                                                                                           |
+|        Filter: (count(*) > 35000)                                                                                                                                              |
+|        Rows Removed by Filter: 1                                                                                                                                               |
+|        Buffers: shared hit=14131, temp read=2364 written=2371                                                                                                                  |
+|        ->  Gather Merge  (cost=51334.30..74701.44 rows=200634 width=26) (actual time=224.714..259.636 rows=201264.00 loops=1)                                                  |
+|              Workers Planned: 2                                                                                                                                                |
+|              Workers Launched: 2                                                                                                                                               |
+|              Buffers: shared hit=14131, temp read=2364 written=2371                                                                                                            |
+|              ->  Sort  (cost=50334.28..50543.27 rows=83598 width=26) (actual time=213.234..217.249 rows=67088.00 loops=3)                                                      |
+|                    Sort Key: p.product_category, o.client_id                                                                                                                   |
+|                    Sort Method: external merge  Disk: 2568kB                                                                                                                   |
+|                    Buffers: shared hit=14131, temp read=2364 written=2371                                                                                                      |
+|                    Worker 0:  Sort Method: external merge  Disk: 2272kB                                                                                                        |
+|                    Worker 1:  Sort Method: external merge  Disk: 2272kB                                                                                                        |
+|                    ->  Nested Loop  (cost=37460.53..41497.65 rows=83598 width=26) (actual time=127.528..171.475 rows=67088.00 loops=3)                                         |
+|                          Buffers: shared hit=14107, temp read=1475 written=1479                                                                                                |
+|                          ->  Merge Join  (cost=37460.25..39379.39 rows=83598 width=20) (actual time=127.279..155.196 rows=67088.00 loops=3)                                    |
+|                                Merge Cond: (o.client_id = c.id)                                                                                                                |
+|                                Buffers: shared hit=13205, temp read=1475 written=1479                                                                                          |
+|                                ->  Sort  (cost=30447.76..30864.64 rows=166751 width=20) (actual time=109.987..118.492 rows=133502.33 loops=3)                                  |
+|                                      Sort Key: o.client_id                                                                                                                     |
+|                                      Sort Method: external merge  Disk: 4248kB                                                                                                 |
+|                                      Buffers: shared hit=7353, temp read=1475 written=1479                                                                                     |
+|                                      Worker 0:  Sort Method: external merge  Disk: 3776kB                                                                                      |
+|                                      Worker 1:  Sort Method: external merge  Disk: 3776kB                                                                                      |
+|                                      ->  Parallel Seq Scan on opt_orders o  (cost=0.00..12561.33 rows=166751 width=20) (actual time=0.052..64.036 rows=133502.33 loops=3)      |
+|                                            Filter: (order_date >= '2024-06-22'::date)                                                                                          |
+|                                            Rows Removed by Filter: 199831                                                                                                      |
+|                                            Buffers: shared hit=7353                                                                                                            |
+|                                ->  Sort  (cost=7011.24..7136.57 rows=50133 width=16) (actual time=17.283..18.998 rows=50119.00 loops=3)                                        |
+|                                      Sort Key: c.id                                                                                                                            |
+|                                      Sort Method: quicksort  Memory: 1537kB                                                                                                    |
+|                                      Buffers: shared hit=5852                                                                                                                  |
+|                                      Worker 0:  Sort Method: quicksort  Memory: 1537kB                                                                                         |
+|                                      Worker 1:  Sort Method: quicksort  Memory: 1537kB                                                                                         |
+|                                      ->  Bitmap Heap Scan on opt_clients c  (cost=564.82..3097.49 rows=50133 width=16) (actual time=1.394..9.802 rows=50119.00 loops=3)        |
+|                                            Recheck Cond: ((status)::text = 'active'::text)                                                                                     |
+|                                            Heap Blocks: exact=1906                                                                                                             |
+|                                            Buffers: shared hit=5852                                                                                                            |
+|                                            ->  Bitmap Index Scan on idx_clients_status  (cost=0.00..552.29 rows=50133 width=0) (actual time=1.129..1.130 rows=50119.00 loops=3)|
+|                                                  Index Cond: ((status)::text = 'active'::text)                                                                                 |
+|                                                  Index Searches: 3                                                                                                             |
+|                                                  Buffers: shared hit=134                                                                                                       |
+|                          ->  Memoize  (cost=0.29..0.30 rows=1 width=14) (actual time=0.000..0.000 rows=1.00 loops=201264)                                                      |
+|                                Cache Key: o.product_id                                                                                                                         |
+|                                Cache Mode: logical                                                                                                                             |
+|                                Hits: 72591  Misses: 100  Evictions: 0  Overflows: 0  Memory Usage: 12kB                                                                        |
+|                                Buffers: shared hit=902                                                                                                                         |
+|                                Worker 0:  Hits: 64094  Misses: 100  Evictions: 0  Overflows: 0  Memory Usage: 12kB                                                             |
+|                                Worker 1:  Hits: 64279  Misses: 100  Evictions: 0  Overflows: 0  Memory Usage: 12kB                                                             |
+|                                ->  Index Scan using opt_products_pkey on opt_products p  (cost=0.28..0.29 rows=1 width=14) (actual time=0.001..0.001 rows=1.00 loops=300)      |
+|                                      Index Cond: (product_id = o.product_id)                                                                                                   |
+|                                      Index Searches: 300                                                                                                                       |
+|                                      Buffers: shared hit=902                                                                                                                   |
+|Planning:                                                                                                                                                                       |
+|  Buffers: shared hit=19                                                                                                                                                        |
+|Planning Time: 0.729 ms                                                                                                                                                         |
+|Execution Time: 284.066 ms                                                                                                                                                      |
