@@ -1,0 +1,28 @@
+|QUERY PLAN                                                                                                                                 |
+|-------------------------------------------------------------------------------------------------------------------------------------------|
+|Nested Loop  (cost=27.38..57.82 rows=7 width=492) (actual time=0.287..0.292 rows=1.00 loops=1)                                             |
+|  Buffers: shared hit=6                                                                                                                    |
+|  ->  Nested Loop  (cost=0.30..16.43 rows=1 width=222) (actual time=0.114..0.116 rows=1.00 loops=1)                                        |
+|        Buffers: shared hit=4                                                                                                              |
+|        ->  Index Scan using orders_pkey on orders o  (cost=0.15..8.17 rows=1 width=8) (actual time=0.077..0.078 rows=1.00 loops=1)        |
+|              Index Cond: (order_id = 3)                                                                                                   |
+|              Index Searches: 1                                                                                                            |
+|              Buffers: shared hit=2                                                                                                        |
+|        ->  Index Scan using customers_pkey on customers c  (cost=0.14..8.16 rows=1 width=222) (actual time=0.032..0.032 rows=1.00 loops=1)|
+|              Index Cond: (customer_id = o.customer_id)                                                                                    |
+|              Index Searches: 1                                                                                                            |
+|              Buffers: shared hit=2                                                                                                        |
+|  ->  Hash Join  (cost=27.09..41.28 rows=7 width=242) (actual time=0.098..0.101 rows=1.00 loops=1)                                         |
+|        Hash Cond: (p.product_id = oi.product_id)                                                                                          |
+|        Buffers: shared hit=2                                                                                                              |
+|        ->  Seq Scan on products p  (cost=0.00..13.00 rows=300 width=222) (actual time=0.021..0.022 rows=5.00 loops=1)                     |
+|              Buffers: shared hit=1                                                                                                        |
+|        ->  Hash  (cost=27.00..27.00 rows=7 width=28) (actual time=0.056..0.057 rows=1.00 loops=1)                                         |
+|              Buckets: 1024  Batches: 1  Memory Usage: 9kB                                                                                 |
+|              Buffers: shared hit=1                                                                                                        |
+|              ->  Seq Scan on order_items oi  (cost=0.00..27.00 rows=7 width=28) (actual time=0.017..0.018 rows=1.00 loops=1)              |
+|                    Filter: (order_id = 3)                                                                                                 |
+|                    Rows Removed by Filter: 5                                                                                              |
+|                    Buffers: shared hit=1                                                                                                  |
+|Planning Time: 0.403 ms                                                                                                                    |
+|Execution Time: 0.366 ms                                                                                                                   |
