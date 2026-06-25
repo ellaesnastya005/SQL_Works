@@ -1,0 +1,59 @@
+```sql
+# Main Tasks — 10 Points
+
+## Task 1 — Function: Calculate Order Total 
+
+create or replace function calculate_order_total(p_order_id int) -- creation of function that takes order_id as input
+returns numeric -- returns number
+language sql
+as $$
+select coalesce(sum(price * quantity), 0) -- logic: multiplicationof price and quantity for each item, sum them all up, return 0 if order is empty
+from order_items
+where order_id = p_order_id; -- filter: only for the given order
+$$;
+
+select calculate_order_total(1);  -- test: check total for order with order_id = 1
+
+## Task 2 — Procedure: Create New Order  
+
+create or replace procedure create_order(p_customer_id int) -- creation of procedure that takes customer_id as input
+language sql
+as $$
+
+insert into orders (customer_id, order_date, total_amount)
+select p_customer_id, current_timestamp, 0 -- insert customer_id, current time and 0 as starting point
+where exists (select 1 from customers where p_customer_id = customer_id); -- only insert if customer exists
+
+$$;
+
+call create_order(2); -- worked: customer with customer_id = 2 exists
+call create_order(10); -- does not worked, because in orders tables there was not any customer with customer_id = 10 
+select * from orders;
+
+
+## Task 3 — Procedure: Add Product to Order 
+
+create or replace procedure add_product_to_order( -- creation of procedure
+    p_order_id int, -- which order
+    p_product_id int, --- which product
+    p_quantity int -- how many
+) 
+language sql
+as $$
+insert into order_items (order_id, product_id, quantity, price)
+select p_order_id, p_product_id, p_quantity, price -- take current price from products table when we add new product
+from products
+where product_id = p_product_id and p_quantity > 0 and stock_quantity >= p_quantity; -- filter: quantity must be > 0 and must have enough stock
+
+update products
+set stock_quantity = stock_quantity - p_quantity -- descrease stock by ordered amount
+where product_id = p_product_id and p_quantity > 0 and stock_quantity >= p_quantity; -- the same filter as above
+$$;
+
+call add_product_to_order(1,1,2); -- added: 2 laptops to order 1
+call add_product_to_order(1,2,0); -- won't added, because quantity needs to be > 0
+call add_product_to_order(1,1,890); -- won't added, because quantity needs to be < stock_quantity (not enough stock)
+
+select * from order_items;
+select * from products; -- checking whether stock decreased
+```
