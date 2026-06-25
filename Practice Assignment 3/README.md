@@ -1,3 +1,7 @@
+# Practice Assignment 3 - order management database
+
+Database system for managing orders in an online store. Implements functions, procedures, triggers, logging and query analysis.
+
 ## Database Structure
 
 ```mermaid
