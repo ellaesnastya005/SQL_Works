@@ -44,3 +44,6 @@ erDiagram
     products ||--o{ order_items : "included in"
     orders ||--o{ order_log : "logged in"
 ```
+
+## Comments about queries:
+Comments and explanation in sql file named "PracticeAssignment3"
