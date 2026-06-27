@@ -1,8 +1,31 @@
 # Practice Assignment 4 
 
-
+Here you can find design and implementation of database for restaurant. The database supports inside-restaurant, takeaway and delivery orders with full order tracking.
 
 ## Database Structure
+
+### Tables
+
+| Table | Description |
+|---|---|
+| `customers` | customers of restaurant with contact info |
+| `staff` | employees: waiters, cooks, couriers, admins |
+| `tables` | physical restaurant tables (indoor/outdoor/bar) |
+| `menu_items` | food and drink items with pricing |
+| `orders` | all orders (delivery, takeaway, inside) |
+| `order_items` | individual items per order |
+| `deliveries` | delivery tracking with courier and platform info |
+
+### Relationships
+
+- `customers` → `orders` (1:many)
+- `staff` → `orders` (1:many)
+- `tables` → `orders` (1:many)
+- `orders` → `order_items` (1:many)
+- `menu_items` → `order_items` (1:many)
+- `orders` → `deliveries` (1:1)
+- `customers` → `deliveries` (1:many)
+- `staff (courier)` → `deliveries` (1:many)
 
 ```mermaid
 erDiagram
@@ -79,9 +102,22 @@ erDiagram
     staff ||--o{ deliveries : "couriers"
 ```
 
-## Comments about queries:
+## Indexes
 
+Indexes created for performance optimization:
+
+| Index | Table | Column |
+|---|---|---|
+| `index_orders_created_at` | orders | created_at |
+| `index_orders_customer_id` | orders | customer_id |
+| `index_orders_status` | orders | status |
+| `index_order_items_order_id` | order_items | order_id |
+| `index_order_items_item_id` | order_items | item_id |
+| `index_deliveries_order_id` | deliveries | order_id |
+
+## Comments about queries:
+Comments for tables and columns you can find in "TablesPracticeAssignment4" file.
 
 ### Note:
-
+The readme file was polished by the use of AI (table constructions(that are inside readme file), typo fixing). Also, main.py file for data insertion in tables was made by AI.
 
