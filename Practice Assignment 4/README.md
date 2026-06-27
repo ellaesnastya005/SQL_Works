@@ -27,6 +27,8 @@ Here you can find design and implementation of database for restaurant. The data
 - `customers` → `deliveries` (1:many)
 - `staff (courier)` → `deliveries` (1:many)
 
+### ERD
+
 ```mermaid
 erDiagram
     customers {
