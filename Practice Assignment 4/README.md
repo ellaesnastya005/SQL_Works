@@ -103,6 +103,39 @@ erDiagram
     customers ||--o{ deliveries : "receives"
     staff ||--o{ deliveries : "couriers"
 ```
+## Files
+
+| File | Description |
+|---|---|
+| `TablesPracticeAssignment4.sql` | creates all tables, constraints, comments and indexes |
+| `PracticeAssignment4View.sql` | creates the `delivery_details` view |
+| `PracticeAssignment4Users.sql` | creates 3 database users with different privileges |
+| `PracticeAssignment4Trigger.sql` | creates the trigger and trigger function |
+| `main.py` | Python script that inserts rows of test data |
+
+## View
+
+delivery_details - a view that shows all delivery orders in one place. It joins data from deliveries, customers, staff (courier) and orders tables, so you can easily see who ordered, who delivers, where and on which platform - without writing a complex query every time
+
+## Users and Privileges
+
+Three database users are created with different levels of access:
+
+| User | Password | Access |
+|---|---|---|
+| `menu_reader` | `123456Aa@` | can only read `menu_items` - for apps or screens that display the menu |
+| `waiter` | `654321Ww@` | can read customers, tables, menu and staff; can create and update orders; can view deliveries |
+| `restaurant_admin` | `654321Admin!@` | full access to all tables, views and sequences |
+
+## Trigger
+
+create_delivery - a trigger on the orders table that fires automatically after a new order is inserted.
+If the order type is 'delivery', it creates a corresponding record in the deliveries table with:
+- status 'waiting' (no courier assigned yet)
+- the customer's address (or 'address not provided' if missing)
+- platform set to 'own delivery' by default
+
+This means you never need to manually insert into deliveries for delivery orders - it happens automatically
 
 ## Indexes
 
@@ -118,7 +151,7 @@ Indexes created for performance optimization:
 | `index_deliveries_order_id` | deliveries | order_id |
 
 ## Comments about queries:
-Comments for tables and columns you can find in "TablesPracticeAssignment4" file.
+Explanation of queries (view, trigger, users, tables) is in sql files.
 
 ### Note:
 The readme file was polished by the use of AI (table constructions(that are inside readme file), typo fixing). Also, main.py file for data insertion in tables was made by AI.
